@@ -1,9 +1,6 @@
 package com.space.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -13,6 +10,8 @@ public class Ship {
     Long id;            // ID корабля
     String name;        // Название корабля (до 50 знаков включительно)
     String planet;      // Планета пребывания (до 50 знаков включительно)
+
+    @Enumerated(EnumType.STRING)
     ShipType shipType;  // Тип корабля
     Date prodDate;      // Дата выпуска. Диапазон значений года 2800..3019 включительно
     Boolean isUsed;     // Использованный / новый
