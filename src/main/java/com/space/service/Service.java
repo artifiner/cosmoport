@@ -1,5 +1,6 @@
 package com.space.service;
 
+import com.space.controller.exceptions.NotFoundException;
 import com.space.model.Ship;
 import com.space.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class Service {
     }
 
     public Ship get(Long id) {
-        return repository.findById(id).orElseThrow(RuntimeException::new);
+        return repository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     public void delete(Long id) {
