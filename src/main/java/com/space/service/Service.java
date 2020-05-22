@@ -26,6 +26,10 @@ public class Service {
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+        } else {
+            throw new NotFoundException();
+        }
     }
 }

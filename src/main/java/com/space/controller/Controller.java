@@ -49,4 +49,20 @@ public class Controller {
         return null;
     }
 
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
+        long parsedId;
+        try {
+            parsedId = Long.parseLong(id);
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (parsedId <=0) {
+            return ResponseEntity.badRequest().build();
+        }
+        service.delete(parsedId);
+        return ResponseEntity.ok().build();
+    }
+
 }
