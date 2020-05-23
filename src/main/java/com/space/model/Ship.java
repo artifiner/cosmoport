@@ -33,7 +33,7 @@ public class Ship {
         this.isUsed = isUsed == null ? false : isUsed;
         this.speed = Math.round(100 * speed) / 100.0;
         this.crewSize = crewSize;
-        refreshRating();
+        this.rating = calculateRating();
     }
 
     public Long getId() {
@@ -97,11 +97,14 @@ public class Ship {
     }
 
     public Double getRating() {
-        refreshRating();
         return rating;
     }
 
-    private void refreshRating() {
-        rating = Math.round(100 * 80 * speed * (isUsed ? 0.5 : 1) / (3019 - prodDate.getYear() + 1)) / 100.0; //TODO: Change 3019 into current year call
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    private Double calculateRating() {
+        return rating = Math.round(100 * 80 * speed * (isUsed ? 0.5 : 1) / (ValuesConstraints.CURRENT_YEAR - prodDate.getYear() + 1)) / 100.0;
     }
 }

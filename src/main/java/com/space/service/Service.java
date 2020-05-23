@@ -40,6 +40,22 @@ public class Service {
                 ShipSpecifications.getPagingAndSortingParameters(order, pageNumber, pageSize)).getContent();
     }
 
+    public Long countShips(String name,
+                                String planet,
+                                ShipType shipType,
+                                Long after,
+                                Long before,
+                                Boolean isUsed,
+                                Double minSpeed,
+                                Double maxSpeed,
+                                Integer minCrewSize,
+                                Integer maxCrewSize,
+                                Double minRating,
+                                Double maxRating) {
+        return repository.count(ShipSpecifications.getSearchSpecification(name, planet, shipType,
+                after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating));
+    }
+
     public Ship get(Long id) {
         return repository.findById(id).orElseThrow(NotFoundException::new);
     }

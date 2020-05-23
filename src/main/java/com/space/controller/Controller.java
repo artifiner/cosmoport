@@ -1,11 +1,10 @@
 package com.space.controller;
 
-import com.space.controller.exceptions.InvalidInputException;
 import com.space.model.Ship;
 import com.space.model.ShipType;
+import com.space.model.ValuesConstraints;
 import com.space.service.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("rest/ships")
@@ -39,10 +37,28 @@ public class Controller {
                                   @RequestParam(required = false, defaultValue = "3") Integer pageSize) {
         List<Ship> list = service.listShips(name, planet, shipType, after, before, isUsed, minSpeed, maxSpeed,
                 minCrewSize, maxCrewSize, minRating, maxRating, order, pageNumber, pageSize);
-        if(list.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Long> getShipCount(@RequestParam(required = false) String name,
+                                             @RequestParam(required = false) String planet,
+                                             @RequestParam(required = false) ShipType shipType,
+                                             @RequestParam(required = false) Long after,
+                                             @RequestParam(required = false) Long before,
+                                             @RequestParam(required = false) Boolean isUsed,
+                                             @RequestParam(required = false) Double minSpeed,
+                                             @RequestParam(required = false) Double maxSpeed,
+                                             @RequestParam(required = false) Integer minCrewSize,
+                                             @RequestParam(required = false) Integer maxCrewSize,
+                                             @RequestParam(required = false) Double minRating,
+                                             @RequestParam(required = false) Double maxRating) {
+        Long count = service.countShips(name, planet, shipType, after, before, isUsed, minSpeed, maxSpeed,
+                minCrewSize, maxCrewSize, minRating, maxRating);
+        if(count == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(count, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
@@ -61,16 +77,21 @@ public class Controller {
     }
 
     @PostMapping
-    public ResponseEntity<Ship> create(@RequestBody Ship ship) {
-        if(ship == null) {
+    public ResponseEntity<Ship> create(@RequestParam String name,
+                                       @RequestParam String planet,
+                                       @RequestParam ShipType shipType,
+                                       @RequestParam Long prodDate,
+                                       @RequestParam(required = false, defaultValue = "false") Boolean isUsed,
+                                       @RequestParam Double speed,
+                                       @RequestParam Integer crewSize) {
+        if(!isValuesValid(name, planet, shipType, prodDate, isUsed, speed, crewSize)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
+        Ship ship = new Ship(name, planet, shipType, new Date(prodDate), isUsed, speed, crewSize);
         Ship createdShip = service.save(ship);
         if(createdShip == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         return new ResponseEntity<>(createdShip, HttpStatus.OK);
     }
 
@@ -96,4 +117,18 @@ public class Controller {
         return ResponseEntity.ok().build();
     }
 
+    boolean isValuesValid(String name, String planet, ShipType shipType, Long prodDate, Boolean isUsed, Double speed, Integer crewSize) {
+        return !(name == null || name.equals("") || name.length() > ValuesConstraints.MAX_NAME_LENGTH ||
+
+                planet == null || planet.equals("") || planet.length() > ValuesConstraints.MAX_PLANET_LENGTH ||
+
+                shipType == null ||
+
+                prodDate == null || prodDate < 0 || new Date(prodDate).getYear() < ValuesConstraints.START_YEAR ||
+                new Date(prodDate).getYear() > ValuesConstraints.CURRENT_YEAR ||
+
+                speed == null || speed < ValuesConstraints.MIN_SPEED || speed > ValuesConstraints.MAX_SPEED ||
+
+                crewSize == null || crewSize < ValuesConstraints.MIN_CREW_SIZE || crewSize > ValuesConstraints.MAX_CREW_SIZE);
+    }
 }
