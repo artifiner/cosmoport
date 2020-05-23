@@ -1,8 +1,8 @@
 package com.space.repository;
 
 import com.space.model.Ship;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
 
-public interface Repository extends CrudRepository<Ship, Long> {
+public interface Repository extends JpaRepositoryImplementation<Ship, Long> {
 
 }

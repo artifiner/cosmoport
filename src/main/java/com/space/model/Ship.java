@@ -8,11 +8,13 @@ public class Ship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;            // ID корабля
+
     String name;        // Название корабля (до 50 знаков включительно)
     String planet;      // Планета пребывания (до 50 знаков включительно)
 
     @Enumerated(EnumType.STRING)
     ShipType shipType;  // Тип корабля
+
     Date prodDate;      // Дата выпуска. Диапазон значений года 2800..3019 включительно
     Boolean isUsed;     // Использованный / новый
     Double speed;       // Максимальная скорость корабля. Диапазон значений 0,01..0,99 включительно.
@@ -28,8 +30,8 @@ public class Ship {
         this.planet = planet;
         this.shipType = shipType;
         this.prodDate = prodDate;
-        this.isUsed = isUsed;
-        this.speed = speed;
+        this.isUsed = isUsed == null ? false : isUsed;
+        this.speed = Math.round(100 * speed) / 100.0;
         this.crewSize = crewSize;
         refreshRating();
     }
@@ -75,7 +77,7 @@ public class Ship {
     }
 
     public void setUsed(Boolean used) {
-        isUsed = used;
+        isUsed = used == null ? false : used;
     }
 
     public Double getSpeed() {
@@ -83,7 +85,7 @@ public class Ship {
     }
 
     public void setSpeed(Double speed) {
-        this.speed = speed;
+        this.speed = Math.round(100 * speed) / 100.0;
     }
 
     public Integer getCrewSize() {
@@ -100,6 +102,6 @@ public class Ship {
     }
 
     private void refreshRating() {
-        rating = 80 * speed * (isUsed ? 0.5 : 1) / (3019 - prodDate.getYear() + 1); //TODO: Change 3019 into current year call
+        rating = Math.round(100 * 80 * speed * (isUsed ? 0.5 : 1) / (3019 - prodDate.getYear() + 1)) / 100.0; //TODO: Change 3019 into current year call
     }
 }

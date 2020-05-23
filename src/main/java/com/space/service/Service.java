@@ -1,10 +1,13 @@
 package com.space.service;
 
+import com.space.controller.ShipOrder;
 import com.space.controller.exceptions.NotFoundException;
 import com.space.model.Ship;
+import com.space.model.ShipType;
 import com.space.repository.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -13,12 +16,28 @@ import java.util.List;
 public class Service {
     @Autowired Repository repository;
 
-    public void save(Ship ship) {
-        repository.save(ship);
+    public Ship save(Ship ship) {
+        return repository.save(ship);
     }
 
-    public List<Ship> listAll() {
-        return (List<Ship>) repository.findAll();
+    public List<Ship> listShips(String name,
+                              String planet,
+                              ShipType shipType,
+                              Long after,
+                              Long before,
+                              Boolean isUsed,
+                              Double minSpeed,
+                              Double maxSpeed,
+                              Integer minCrewSize,
+                              Integer maxCrewSize,
+                              Double minRating,
+                              Double maxRating,
+                              ShipOrder order,
+                              Integer pageNumber,
+                              Integer pageSize) {
+        return repository.findAll(ShipSpecifications.getSearchSpecification(name, planet, shipType,
+                after, before, isUsed, minSpeed, maxSpeed, minCrewSize, maxCrewSize, minRating, maxRating),
+                ShipSpecifications.getPagingAndSortingParameters(order, pageNumber, pageSize)).getContent();
     }
 
     public Ship get(Long id) {
