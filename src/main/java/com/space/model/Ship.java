@@ -19,22 +19,11 @@ public class Ship {
     private Date prodDate;      // Дата выпуска. Диапазон значений года 2800..3019 включительно
     private Boolean isUsed;     // Использованный / новый
     private Double speed;       // Максимальная скорость корабля. Диапазон значений 0,01..0,99 включительно.
-                        // Используй математическое округление до сотых.
+                                // Используй математическое округление до сотых.
     private Integer crewSize;   // Количество членов экипажа. Диапазон значений 1..9999 включительно.
     private Double rating;      // Рейтинг корабля. Используй математическое округление до сотых.
 
     public Ship() {
-    }
-
-    public Ship(String name, String planet, ShipType shipType, Date prodDate, Boolean isUsed, Double speed, Integer crewSize) {
-        this.name = name;
-        this.planet = planet;
-        this.shipType = shipType;
-        this.prodDate = prodDate;
-        this.isUsed = isUsed;
-        this.speed = speed;
-        this.crewSize = crewSize;
-        this.rating = calculateRating();
     }
 
     public Long getId() {
@@ -78,7 +67,7 @@ public class Ship {
     }
 
     public void setUsed(Boolean used) {
-        isUsed = used == null ? false : used;
+        isUsed = used;
     }
 
     public Double getSpeed() {
@@ -86,7 +75,7 @@ public class Ship {
     }
 
     public void setSpeed(Double speed) {
-        this.speed = Math.round(100 * speed) / 100.0;
+        this.speed = speed;
     }
 
     public Integer getCrewSize() {
@@ -105,9 +94,9 @@ public class Ship {
         this.rating = rating;
     }
 
-    public Double calculateRating() {
+    public double getCalculatedRating() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(prodDate);
-        return rating = Math.round(100 * 80 * speed * (isUsed ? 0.5 : 1) / (ValuesConstraints.CURRENT_YEAR - calendar.get(Calendar.YEAR) + 1)) / 100.0;
+        return ValuesHelper.roundToHundredths(80 * speed * (isUsed ? 0.5 : 1) / (ValuesHelper.CURRENT_YEAR - calendar.get(Calendar.YEAR) + 1));
     }
 }
