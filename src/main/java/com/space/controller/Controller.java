@@ -76,18 +76,9 @@ public class Controller {
         return ResponseEntity.ok(service.get(parsedId));
     }
 
-    @PostMapping
-    public ResponseEntity<Ship> create(@RequestParam String name,
-                                       @RequestParam String planet,
-                                       @RequestParam ShipType shipType,
-                                       @RequestParam Long prodDate,
-                                       @RequestParam(required = false, defaultValue = "false") Boolean isUsed,
-                                       @RequestParam Double speed,
-                                       @RequestParam Integer crewSize) {
-        if(!isValuesValid(name, planet, shipType, prodDate, isUsed, speed, crewSize)) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        Ship ship = new Ship(name, planet, shipType, new Date(prodDate), isUsed, speed, crewSize);
+    @PostMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public ResponseEntity<Ship> create(@RequestBody Ship ship) {
         Ship createdShip = service.save(ship);
         if(createdShip == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -95,40 +86,33 @@ public class Controller {
         return new ResponseEntity<>(createdShip, HttpStatus.OK);
     }
 
-    @PostMapping("{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Ship update(@PathVariable Long id, @RequestBody Ship ship) {
-        return null;
+    @PostMapping(path = "/test", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public ResponseEntity<Ship> test(@RequestBody Ship ship) {
+
+        return new ResponseEntity<>(service.validateAndGetShip(ship), HttpStatus.OK);
+        //        ship = new Ship("123456789", "Earth", ShipType.MILITARY, new Date(32998274577071L), true, 0.8, 14);
+//        Ship createdShip = service.save(ship);
+//        if(createdShip == null) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        return new ResponseEntity<>(createdShip, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/{id}")
+    public ResponseEntity<Ship> update(@PathVariable Long id, @RequestBody Ship ship) {
+        Ship updatedShip = service.update(id, ship);
+        return new ResponseEntity<>(updatedShip, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Void> delete(@PathVariable("id") String id) {
-        long parsedId;
-        try {
-            parsedId = Long.parseLong(id);
-        } catch (NumberFormatException e) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        if (id <=0) {
             return ResponseEntity.badRequest().build();
         }
-        if (parsedId <=0) {
-            return ResponseEntity.badRequest().build();
-        }
-        service.delete(parsedId);
+        service.delete(id);
         return ResponseEntity.ok().build();
     }
 
-    boolean isValuesValid(String name, String planet, ShipType shipType, Long prodDate, Boolean isUsed, Double speed, Integer crewSize) {
-        return !(name == null || name.equals("") || name.length() > ValuesConstraints.MAX_NAME_LENGTH ||
-
-                planet == null || planet.equals("") || planet.length() > ValuesConstraints.MAX_PLANET_LENGTH ||
-
-                shipType == null ||
-
-                prodDate == null || prodDate < 0 || new Date(prodDate).getYear() < ValuesConstraints.START_YEAR ||
-                new Date(prodDate).getYear() > ValuesConstraints.CURRENT_YEAR ||
-
-                speed == null || speed < ValuesConstraints.MIN_SPEED || speed > ValuesConstraints.MAX_SPEED ||
-
-                crewSize == null || crewSize < ValuesConstraints.MIN_CREW_SIZE || crewSize > ValuesConstraints.MAX_CREW_SIZE);
-    }
 }

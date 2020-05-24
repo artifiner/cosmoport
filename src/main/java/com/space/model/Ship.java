@@ -1,26 +1,27 @@
 package com.space.model;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
 public class Ship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;            // ID корабля
+    private Long id;            // ID корабля
 
-    String name;        // Название корабля (до 50 знаков включительно)
-    String planet;      // Планета пребывания (до 50 знаков включительно)
+    private String name;        // Название корабля (до 50 знаков включительно)
+    private String planet;      // Планета пребывания (до 50 знаков включительно)
 
     @Enumerated(EnumType.STRING)
-    ShipType shipType;  // Тип корабля
+    private ShipType shipType;  // Тип корабля
 
-    Date prodDate;      // Дата выпуска. Диапазон значений года 2800..3019 включительно
-    Boolean isUsed;     // Использованный / новый
-    Double speed;       // Максимальная скорость корабля. Диапазон значений 0,01..0,99 включительно.
+    private Date prodDate;      // Дата выпуска. Диапазон значений года 2800..3019 включительно
+    private Boolean isUsed;     // Использованный / новый
+    private Double speed;       // Максимальная скорость корабля. Диапазон значений 0,01..0,99 включительно.
                         // Используй математическое округление до сотых.
-    Integer crewSize;   // Количество членов экипажа. Диапазон значений 1..9999 включительно.
-    Double rating;      // Рейтинг корабля. Используй математическое округление до сотых.
+    private Integer crewSize;   // Количество членов экипажа. Диапазон значений 1..9999 включительно.
+    private Double rating;      // Рейтинг корабля. Используй математическое округление до сотых.
 
     public Ship() {
     }
@@ -30,8 +31,8 @@ public class Ship {
         this.planet = planet;
         this.shipType = shipType;
         this.prodDate = prodDate;
-        this.isUsed = isUsed == null ? false : isUsed;
-        this.speed = Math.round(100 * speed) / 100.0;
+        this.isUsed = isUsed;
+        this.speed = speed;
         this.crewSize = crewSize;
         this.rating = calculateRating();
     }
@@ -104,7 +105,9 @@ public class Ship {
         this.rating = rating;
     }
 
-    private Double calculateRating() {
-        return rating = Math.round(100 * 80 * speed * (isUsed ? 0.5 : 1) / (ValuesConstraints.CURRENT_YEAR - prodDate.getYear() + 1)) / 100.0;
+    public Double calculateRating() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(prodDate);
+        return rating = Math.round(100 * 80 * speed * (isUsed ? 0.5 : 1) / (ValuesConstraints.CURRENT_YEAR - calendar.get(Calendar.YEAR) + 1)) / 100.0;
     }
 }
